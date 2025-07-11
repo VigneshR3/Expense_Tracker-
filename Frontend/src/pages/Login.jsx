@@ -10,7 +10,7 @@ function Login() {
 
   const styles = {
     container: { padding: 20 },
-    form: { border: "1px solid #ccc", padding: 20 },
+    form: { border: "1px solid #ccc", padding: 20 ,borderRadius:15,boxShadow:"2px 2px 2px"},
     inputGroup: { marginBottom: 10 },
     input: { padding: 8, width: "100%" },
     button: { padding: 10, backgroundColor: "blue", color: "white", border: "none", cursor: "pointer" },
@@ -49,6 +49,8 @@ function Login() {
   };
 
   return (
+    <div style={{margin:'auto',maxWidth:350}}>
+
     <div style={styles.container}>
       <form onSubmit={handleLogin} style={styles.form}>
         <h2 style={styles.lo}>Login</h2>
@@ -77,15 +79,16 @@ function Login() {
           />
         </div>
 
-        <button type="submit" style={styles.button} onClick={handleLogin}>Login</button>
+        <button type="submit" className="btn-custom" onClick={handleLogin}>Login</button>
 
         <p style={{ marginTop: 10 }}>
           Don't have an account?{" "}
-          <Link to="/Register" style={{ color: "blue", textDecoration: "underline" }}>
+          <Link to="/" style={{ color: "blue", textDecoration: "underline" }}>
             Register here
           </Link>
         </p>
       </form>
+    </div>
     </div>
   );
 }

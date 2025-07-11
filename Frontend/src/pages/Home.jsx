@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import InputField from "../componets/InputField";
- 
+import axios from "axios";
+import { BaseApi } from "../baseApi";
 
 const Home = () => {
   const [isShow, setIsShow] = useState(true);
@@ -12,37 +13,39 @@ const Home = () => {
     { type: "text", name: "Description" },
     { type: "text", name: "Category" },
     { type: "date", name: "Date" },
-    
   ];
   const [Expence, setExpence] = useState({
     name: "",
     description: "",
     category: "",
     date: "",
+    email: "vicky@gmail.com",
   });
-  const HandleSubmit = ()=>{
-    console.log("values",Expence)
-  }
-  const [TableData, setTableData] = useState([
-    {
-      name: "vicky",
-      description: "hello",
-      category: "food",
-      data: "4/07/2025",
-    },
-    {
-      name: "ranjith",
-      description: "hello",
-      category: "Travel",
-      data: "4/07/2025",
-    },
-    {
-      name: "tamil",
-      description: "hello",
-      category: "Shopping",
-      data: "4/07/2025",
-    },
-  ]);
+  const HandleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("values", Expence);
+    await axios
+      .post(`${BaseApi}/expense/create`, Expence)
+      .then((resp) => {
+        console.log("Form response", resp);
+      })
+      .catch((e) => {
+        console.log("Form error", e);
+      });
+  };
+  const UserEmail = {email:"vicky@gmail.com"};
+  const [TableData, setTableData] = useState([]);
+  useEffect(  () => {
+      axios
+      .post(`${BaseApi}/expense/getdata`, UserEmail)
+      .then((resp) => {
+        console.log("response", resp);
+        setTableData(resp.data.data)
+      })
+      .catch((e) => {
+        console.log("error", e);
+      });
+  }, []);
   const TextHandle = (e) => {
     console.log(e.target.name);
     const { name, value } = e.target;
@@ -51,14 +54,18 @@ const Home = () => {
       [name.toLowerCase()]: value,
     }));
   };
-   
+
   return (
     <div>
       <h5 style={{ display: "flex", justifyContent: "center" }}>
         Expense Tracker
       </h5>
       {isShow && (
-        <button className="btn-custom" style={{margin:5}} onClick={isShowHandle}>
+        <button
+          className="btn-custom"
+          style={{ margin: 5 }}
+          onClick={isShowHandle}
+        >
           Add Expenses
         </button>
       )}
@@ -67,7 +74,7 @@ const Home = () => {
         {!isShow && (
           <div
             className="card bg-secondary"
-            style={{ maxWidth: "350px", boxShadow: "2px 2px 5px " ,margin:5}}
+            style={{ maxWidth: "350px", boxShadow: "2px 2px 5px ", margin: 5 }}
           >
             <form>
               {FormFields.map((field, i) => {
@@ -75,7 +82,13 @@ const Home = () => {
                   <InputField key={i} field={field} TextHandle={TextHandle} />
                 );
               })}
-             <button className='btn-custom' onClick={HandleSubmit} style={{margin:5}}>Submit</button>
+              <button
+                className="btn-custom"
+                onClick={HandleSubmit}
+                style={{ margin: 5 }}
+              >
+                Submit
+              </button>
             </form>
           </div>
         )}
@@ -83,28 +96,24 @@ const Home = () => {
       {/* table content */}
       <div>
         <table>
-           
-            <tr>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Categories</th>
-              <th>Date</th>
-            </tr>
-          
-          
-             {
-                TableData && TableData.map( (item , i)=>{
-                    return(
-                        <tr>
-                            <td>{item.name}</td>
-                            <td>{item.description}</td>
-                            <td>{item.category}</td>
-                            <td>{item.data}</td>
-                        </tr>
-                    )
-                })
-             }
-           
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Categories</th>
+            <th>Date</th>
+          </tr>
+
+          {TableData &&
+            TableData.map((item, i) => {
+              return (
+                <tr key={i}>
+                  <td>{item.name}</td>
+                  <td>{item.description}</td>
+                  <td>{item.category}</td>
+                  <td>{item.date}</td>
+                </tr>
+              );
+            })}
         </table>
       </div>
     </div>
