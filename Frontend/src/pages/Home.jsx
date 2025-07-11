@@ -12,6 +12,7 @@ const Home = () => {
     { type: "text", name: "Description" },
     { type: "text", name: "Category" },
     { type: "date", name: "Date" },
+    
   ];
   const [Expence, setExpence] = useState({
     name: "",
@@ -57,7 +58,7 @@ const Home = () => {
         Expense Tracker
       </h5>
       {isShow && (
-        <button className="btn-custom" onClick={isShowHandle}>
+        <button className="btn-custom" style={{margin:5}} onClick={isShowHandle}>
           Add Expenses
         </button>
       )}
@@ -66,7 +67,7 @@ const Home = () => {
         {!isShow && (
           <div
             className="card bg-secondary"
-            style={{ maxWidth: "350px", boxShadow: "2px 2px 5px " }}
+            style={{ maxWidth: "350px", boxShadow: "2px 2px 5px " ,margin:5}}
           >
             <form>
               {FormFields.map((field, i) => {
@@ -82,15 +83,15 @@ const Home = () => {
       {/* table content */}
       <div>
         <table>
-          <th>
+           
             <tr>
-              <td>Name</td>
-              <td>Description</td>
-              <td>Categories</td>
-              <td>Date</td>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Categories</th>
+              <th>Date</th>
             </tr>
-          </th>
-          <tbody>
+          
+          
              {
                 TableData && TableData.map( (item , i)=>{
                     return(
@@ -103,7 +104,7 @@ const Home = () => {
                     )
                 })
              }
-          </tbody>
+           
         </table>
       </div>
     </div>
