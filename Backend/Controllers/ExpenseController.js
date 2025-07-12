@@ -31,4 +31,41 @@ module.exports = {
       res.status(400).json({ message: "Faild ! fetch data" });
     }
   },
+  // name: 'd',
+  // description: 'world',
+  // category: 'Food',
+  // date: '2025-07-12',
+  // email: 'vicky@gmail.com',
+  // id: '687210b638b6ebbc50270f84'
+  UpdateExpense: async (req, res) => {
+    try {
+      console.log("Request Body:", req.body);
+
+      const update = await Expense.updateOne(
+        { _id: req.body.id },
+        {
+          $set: {
+            name: req.body.name,
+            category: req.body.category,
+            date: req.body.date,
+            description: req.body.description,
+          },
+        }
+      );
+
+      res.status(200).json({ message: "Data updated successfully", update });
+    } catch (error) {
+      console.error("Update error:", error);
+      res.status(400).json({ message: "Failed to update data" });
+    }
+  },
+  DeleteOneExpense: async (req, res) => {
+    try {
+      console.log(req.query);
+      await Expense.findOneAndDelete({ _id: req.query.id });
+      res.status(200).json({ message: "successfully Deleted" });
+    } catch (error) {
+      res.status(400).json({ message: "Failed to Delete", error });
+    }
+  },
 };

@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import InputField from "../componets/InputField";
 import axios from "axios";
 import { BaseApi } from "../baseApi";
+import { MdOutlineEditCalendar } from "react-icons/md";
 import { ToastContainer, toast } from "react-toastify";
+import { MdOutlineDeleteOutline } from "react-icons/md";
+import Swal from "sweetalert2";
 
 const Home = () => {
   const [isShow, setIsShow] = useState(true);
@@ -13,39 +16,78 @@ const Home = () => {
   const FormFields = [
     { type: "text", name: "Name" },
     { type: "text", name: "Description" },
-    { type: "text", name: "Category" },
+    {
+      type: "text",
+      name: "Category",
+      list: ["Empty", "Food", "Trip", "Shopping", "Other"],
+    },
     { type: "date", name: "Date" },
   ];
-  const [Expence, setExpence] = useState({
+  const [Expense, setExpense] = useState({
     name: "",
     description: "",
     category: "",
     date: "",
     email: "vicky@gmail.com",
+    id: "",
   });
+  
   const HandleSubmit = async (e) => {
+    const { email, ...formFields } = Expense;
+  const isEmpty = Object.values(formFields).every((value) => value === "");
+    
+     if(isEmpty){
+      toast.error("please fill the fields")
+      return;
+     }
     e.preventDefault();
-    console.log("values", Expence);
-    await axios
-      .post(`${BaseApi}/expense/create`, Expence)
-      .then((resp) => {
-        console.log("Form response", resp);
-        notify(resp.data.message);
-        FetchDate();
-      })
-      .catch((e) => {
-        console.log("Form error", e);
-      });
+    if (isEdit ) {
+      await axios
+        .patch(`${BaseApi}/expense/update`, Expense)
+        .then((resp) => {
+          console.log("update respone", resp);
+          FetchDate();
+          notify(resp.data.message);
+        })
+        .catch((e) => {
+          console.log("error UPdate", e);
+          notify(e.response.data.message);
+        });
+    } else {
+      
+
+        await axios
+          .post(`${BaseApi}/expense/create`, Expense)
+          .then((resp) => {
+            console.log("Form response", resp);
+            notify(resp.data.message);
+            FetchDate();
+            setExpense({
+              name: "",
+              description: "",
+              category: "",
+              date: "",
+              email: "vicky@gmail.com",
+              id: "",
+            });
+          })
+          .catch((e) => {
+            console.log("Form error", e);
+            notify(e.response.data.message);
+          });
+      
+    }
   };
   const UserEmail = { email: "vicky@gmail.com" };
   const [TableData, setTableData] = useState([]);
+  const [isEdit, setIsEdit] = useState(false);
+
   const FetchDate = () => {
     axios
       .post(`${BaseApi}/expense/getdata`, UserEmail)
       .then((resp) => {
         console.log("response", resp);
         setTableData(resp.data.data);
-         
       })
       .catch((e) => {
         console.log("error", e);
@@ -55,12 +97,69 @@ const Home = () => {
     FetchDate();
   }, []);
   const TextHandle = (e) => {
-    console.log(e.target.name);
     const { name, value } = e.target;
-    setExpence((state) => ({
+    setExpense((state) => ({
       ...state,
       [name.toLowerCase()]: value,
     }));
+  };
+  //Cancel
+  const handleCancel = (e) => {
+    e.preventDefault();
+    setIsShow(true);
+    setExpense({
+      name: "",
+      description: "",
+      category: "",
+      date: "",
+      email: "vicky@gmail.com",
+      id: "",
+    });
+  };
+  // List Editing
+  const HandleEdit = (List) => {
+    setIsEdit(true);
+    setIsShow(false);
+    console.log("LIST", List);
+    setExpense({
+      name: List.name,
+      description: List.description,
+      category: List.category,
+      date: List.date,
+      email: "vicky@gmail.com",
+      id: List._id,
+    });
+  };
+  // Delete one Expense
+  const HandleDelete = async (e) => {
+    console.log(e._id);
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your expense has been deleted.",
+          icon: "success",
+        });
+        await axios
+          .get(`${BaseApi}/expense/delete?id=${e._id}`)
+          .then((resp) => {
+            console.log("respone Delete", resp);
+            FetchDate();
+          })
+          .catch((e) => {
+            console.log("Error", e);
+          });
+      }
+    });
   };
 
   return (
@@ -87,30 +186,53 @@ const Home = () => {
           >
             <form>
               {FormFields.map((field, i) => {
+                const value = Expense[field.name.toLowerCase()];
                 return (
-                  <InputField key={i} field={field} TextHandle={TextHandle} />
+                  <InputField
+                    key={i}
+                    field={field}
+                    TextHandle={TextHandle}
+                    value={value}
+                  />
                 );
               })}
-              <button
-                className="btn-custom"
-                onClick={HandleSubmit}
-                style={{ margin: 5 }}
-              >
-                Submit
-              </button>
+            
+              <div style={{ display: "flex", justifyContent: "space-around" }}>
+                <button
+                  className="btn-custom"
+                  onClick={HandleSubmit}
+                  style={{ margin: 5 }}
+                >
+                  {isEdit ? "Update" : "Submit"}
+                </button>
+                <button
+                  className="btn-custom "
+                  style={{
+                    backgroundColor: "#fff",
+                    color: "#fd610d",
+                    margin: 5,
+                  }}
+                  onClick={handleCancel}
+                >
+                  {" "}
+                  Cancel
+                </button>
+              </div>
             </form>
           </div>
         )}
       </center>
       {/* table content */}
-      <div class="styled-table-container">
-        <table class="styled-table">
+      <div className="styled-table-container">
+        <table className="styled-table">
           <thead>
             <tr>
               <th>Name</th>
               <th>Description</th>
               <th>Categories</th>
               <th>Date</th>
+              <th>Edit</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody>
@@ -122,6 +244,25 @@ const Home = () => {
                     <td>{item.description}</td>
                     <td>{item.category}</td>
                     <td>{item.date}</td>
+                    <td>
+                      <MdOutlineEditCalendar
+                        size={20}
+                        tabIndex={0}
+                        style={{ outline: "none" }}
+                        onClick={() => {
+                          HandleEdit(item);
+                        }}
+                      />
+                    </td>
+                    <td>
+                      <MdOutlineDeleteOutline
+                        onClick={() => HandleDelete(item)}
+                        size={20}
+                        color="red"
+                        style={{ outline: "none" }}
+                        tabIndex={0}
+                      />
+                    </td>
                   </tr>
                 );
               })}
