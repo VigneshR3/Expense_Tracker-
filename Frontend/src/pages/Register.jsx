@@ -1,6 +1,3 @@
- 
-
-
 import React from "react";
 import axios from "axios";
 import { useState } from "react";
@@ -78,9 +75,58 @@ const handleSubmit2 =()=>{
 }
 
   return (
-    <div>
-         
-            
+    <div style={styles.container}>
+      <form onSubmit={handleSubmit} style={styles.form}>
+        <h2 style={styles.lo}> Register</h2>
+
+        {error && <p style={styles.error}>{error}</p>}
+
+         <div style={styles.inputGroup}>
+          <label>users</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            style={styles.input}
+            placeholder="Enter your username"
+          />
+        </div>
+
+        <div style={styles.inputGroup}>
+          <label>Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={styles.input}
+            placeholder="Enter your email"
+          />
+        </div>
+
+        <div style={styles.inputGroup}>
+          <label>Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={styles.input}
+            placeholder="Enter your password"
+          />
+        </div>
+
+        <div style={styles.inputGroup}>
+          <label>ConfirmPassword</label>
+          <input
+            type="password"
+            value={confirmpassword}
+            onChange={(e) => setConfirmpassword(e.target.value)}
+            style={styles.input}
+            placeholder="Enter your password"
+          />
+        </div>
+
+        <button type="submit"onClick={handleSubmit2} style={styles.button}>Login</button>
+      </form>
     </div>
   );
 }
