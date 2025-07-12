@@ -16,20 +16,19 @@ module.exports = {
         date: date,
       });
 
-      res.status(201).json({ message: "ok", date: newData });
+      res.status(201).json({ message: "Successfully added" });
     } catch (error) {
       res.status(400).json({ message: "faild !" });
     }
   },
-  GetExpense : async(req ,res)=>{
+  GetExpense: async (req, res) => {
     try {
-        console.log(req.body)
-        const {email} = req.body
-        const getDate = await Expense.find({userId:email})
-        res.status(200).json({message:"fetch data",data:getDate})
+      console.log(req.body);
+      const { email } = req.body;
+      const getDate = await Expense.find({ userId: email });
+      res.status(200).json({ message: "fetch data", data: getDate });
     } catch (error) {
-        res.status(400).json({message:"Faild ! fetch data",})
-        
+      res.status(400).json({ message: "Faild ! fetch data" });
     }
-  }
+  },
 };

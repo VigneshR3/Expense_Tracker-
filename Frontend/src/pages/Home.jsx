@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import InputField from "../componets/InputField";
 import axios from "axios";
 import { BaseApi } from "../baseApi";
+import { ToastContainer, toast } from "react-toastify";
 
 const Home = () => {
   const [isShow, setIsShow] = useState(true);
   const isShowHandle = () => {
     setIsShow(false);
   };
+  const notify = (e) => toast(e);
   const FormFields = [
     { type: "text", name: "Name" },
     { type: "text", name: "Description" },
@@ -28,23 +30,29 @@ const Home = () => {
       .post(`${BaseApi}/expense/create`, Expence)
       .then((resp) => {
         console.log("Form response", resp);
+        notify(resp.data.message);
+        FetchDate();
       })
       .catch((e) => {
         console.log("Form error", e);
       });
   };
-  const UserEmail = {email:"vicky@gmail.com"};
+  const UserEmail = { email: "vicky@gmail.com" };
   const [TableData, setTableData] = useState([]);
-  useEffect(  () => {
-      axios
+  const FetchDate = () => {
+    axios
       .post(`${BaseApi}/expense/getdata`, UserEmail)
       .then((resp) => {
         console.log("response", resp);
-        setTableData(resp.data.data)
+        setTableData(resp.data.data);
+         
       })
       .catch((e) => {
         console.log("error", e);
       });
+  };
+  useEffect(() => {
+    FetchDate();
   }, []);
   const TextHandle = (e) => {
     console.log(e.target.name);
@@ -57,6 +65,7 @@ const Home = () => {
 
   return (
     <div>
+      <ToastContainer />
       <h5 style={{ display: "flex", justifyContent: "center" }}>
         Expense Tracker
       </h5>
@@ -94,26 +103,29 @@ const Home = () => {
         )}
       </center>
       {/* table content */}
-      <div>
-        <table>
-          <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Categories</th>
-            <th>Date</th>
-          </tr>
-
-          {TableData &&
-            TableData.map((item, i) => {
-              return (
-                <tr key={i}>
-                  <td>{item.name}</td>
-                  <td>{item.description}</td>
-                  <td>{item.category}</td>
-                  <td>{item.date}</td>
-                </tr>
-              );
-            })}
+      <div class="styled-table-container">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Categories</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {TableData &&
+              TableData.map((item, i) => {
+                return (
+                  <tr key={i}>
+                    <td>{item.name}</td>
+                    <td>{item.description}</td>
+                    <td>{item.category}</td>
+                    <td>{item.date}</td>
+                  </tr>
+                );
+              })}
+          </tbody>
         </table>
       </div>
     </div>
