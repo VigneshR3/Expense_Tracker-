@@ -2,14 +2,13 @@ const Expense = require("../Models/ExpenseModel");
 module.exports = {
   NewExpense: async (req, res) => {
     try {
-      console.log(req.body);
-      //             name: 'viot',
-      //   description: 'FrontEnd( React Framework & library)',
-      //   category: 'cat',
-      //   date: '2025-07-11'
-      const { name, description, category, date, email } = req.body;
+      
+      
+      const { name, description, category, date, } = req.body;
+      const {userdata} = req.payload
+       
       const newData = await Expense.create({
-        userId: email,
+        userId: userdata.id,
         name: name,
         description: description,
         category: category,
@@ -23,20 +22,15 @@ module.exports = {
   },
   GetExpense: async (req, res) => {
     try {
-      console.log(req.body);
-      const { email } = req.body;
-      const getDate = await Expense.find({ userId: email });
+      console.log("playload",req.payload);
+      const { userdata } = req.payload;
+      const getDate = await Expense.find({userId:userdata.id})
       res.status(200).json({ message: "fetch data", data: getDate });
     } catch (error) {
       res.status(400).json({ message: "Faild ! fetch data" });
     }
   },
-  // name: 'd',
-  // description: 'world',
-  // category: 'Food',
-  // date: '2025-07-12',
-  // email: 'vicky@gmail.com',
-  // id: '687210b638b6ebbc50270f84'
+   
   UpdateExpense: async (req, res) => {
     try {
       console.log("Request Body:", req.body);

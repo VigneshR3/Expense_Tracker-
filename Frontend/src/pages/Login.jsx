@@ -1,13 +1,13 @@
 
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-
+  const navigate = useNavigate()
   const styles = {
     container: { padding: 20 },
     form: { border: "1px solid #ccc", padding: 20 ,borderRadius:15,boxShadow:"2px 2px 2px"},
@@ -25,23 +25,21 @@ function Login() {
     if (!email || !password) {
       setError('Email and password are required.');
       return;
-      
-
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/api/user/login", {
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
         email,
         password,
       });
-
-      console.log("Login Success:", res.data);
-      alert("Login successful!");
-      console.log(email)
-      console.log(password)
-
+      if(res.status === 200){
+         const {token} = res.data
+         localStorage.setItem("token", token)
+         navigate("/home")
+      }
       setEmail('');
       setPassword('');
+    
     } catch (err) {
       console.error("Login Failed:", err);
       setError('Invalid email or password.');

@@ -1,88 +1,78 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { useState } from "react";
+import { BaseApi } from "../baseApi";
+import { Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Register() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmpassword, setConfirmpassword] = useState('');
-  const [error, setError] = useState('');
-  
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmpassword, setConfirmpassword] = useState("");
+  const [error, setError] = useState("");
 
-  
+  const notify = (message) => toast(message);
 
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!username || !email || !password || !confirmpassword) {
-      setError('Username, email, and password are required.');
-      alert('Username, email, and password are required.');
+      setError("All fields are required.");
       return;
     }
 
-    if (username=== 'raji' && email === 'raji333@gmail.com' && password === 'raji123') {
-      alert('Login successful!');
-      setUsername('');
-      setEmail('');
-      setPassword('');
-   
-    } else {
-      alert('Invalid email or password.');
+    if (password !== confirmpassword) {
+      setError("Passwords do not match.");
+      return;
     }
-        console.log(username)
-    console.log(email)
-    console.log(password)
-    console.log(confirmpassword)
+
+    try {
+      const res = await axios.post(`${BaseApi}/auth/register`, {
+        username,
+        email,
+        password,
+      });
+      notify(res.data.message || "Registration successful!");
+    } catch (e) {
+      setError("Registration failed.");
+      console.error("Error:", e);
+    }
   };
 
-  const fetchHandle = async () => {
-    await axios
-      .get("http://localhost:5000/getUser")
-      .then((res) => {
-        setUser(res.data.user);
-      })
-      .catch((e) => {
-        console.log(e);
-       });
-  };
-
-   const styles = {
-    container: { padding: 20 },
-    form: { border: "1px solid #ccc", padding: 20 },
+  const styles = {
+    container: { padding: 20, maxWidth: 360, margin: "auto" },
+    form: {
+      border: "1px solid #ccc",
+      padding: 20,
+      borderRadius: "12px",
+      boxShadow: "2px 2px 2px",
+    },
     inputGroup: { marginBottom: 10 },
     input: { padding: 8, width: "100%" },
-    button: { padding: 10, backgroundColor: "blue", color: "white" },
+    button: {
+      padding: 10,
+      backgroundColor: "blue",
+      color: "white",
+      width: "100%",
+      border: "none",
+      borderRadius: 4,
+    },
     error: { color: "red" },
     lo: { textAlign: "center" },
   };
-const handleSubmit2 =()=>{
-  axios
-    .post("http://localhost:5000/api/user/register", {
-      username,
-      email,
-      password,
-      confirmpassword,
-    })
-    .then((res) => {
-      console.log("Response", res);
-    })
-    .catch((e) => {
-      console.log("Error", e);
-    });
-}
 
   return (
     <div style={styles.container}>
+      <ToastContainer />
       <form onSubmit={handleSubmit} style={styles.form}>
-        <h2 style={styles.lo}> Register</h2>
+        <h2 style={styles.lo}>Register</h2>
 
         {error && <p style={styles.error}>{error}</p>}
 
-         <div style={styles.inputGroup}>
-          <label>users</label>
+        <div style={styles.inputGroup}>
+          <label>Username</label>
           <input
             type="text"
             value={username}
@@ -115,19 +105,29 @@ const handleSubmit2 =()=>{
         </div>
 
         <div style={styles.inputGroup}>
-          <label>ConfirmPassword</label>
+          <label>Confirm Password</label>
           <input
             type="password"
             value={confirmpassword}
             onChange={(e) => setConfirmpassword(e.target.value)}
             style={styles.input}
-            placeholder="Enter your password"
+            placeholder="Confirm your password"
           />
         </div>
 
-        <button type="submit"onClick={handleSubmit2} style={styles.button}>Login</button>
+        <button type="submit" className="btn-custom">
+          Register
+        </button>
+
+        <p style={styles.lo}>
+          Already have an account?{" "}
+          <Link to={"/login"} style={{ color: "blue" }}>
+            Login
+          </Link>
+        </p>
       </form>
     </div>
   );
 }
+
 export default Register;

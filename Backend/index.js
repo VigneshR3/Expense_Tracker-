@@ -18,7 +18,7 @@ const PORT = 5000
 app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+ 
 //Routers
 app.use('/api/auth',UserRouter)
 app.use('/api/expense',ExpenseRouter)

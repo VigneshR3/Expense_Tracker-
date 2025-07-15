@@ -14,7 +14,8 @@ $theme-colors: (
 // _buttons.scss
 
 .btn-custom {
-  background-color: $primary;     // Your custom color
+  background-color: $primary; 
+  width: 100%;    // Your custom color
   color: white;
   border: none;
   padding: 10px;

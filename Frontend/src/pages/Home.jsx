@@ -19,7 +19,7 @@ const Home = () => {
     {
       type: "text",
       name: "Category",
-      list: ["Empty", "Food", "Trip", "Shopping", "Other"],
+      list: ["Empty", "Food", "Trip", "Shopping","Bills", "Other"],
     },
     { type: "date", name: "Date" },
   ];
@@ -28,8 +28,8 @@ const Home = () => {
     description: "",
     category: "",
     date: "",
-    email: "vicky@gmail.com",
-    id: "",
+    
+     
   });
   
   const HandleSubmit = async (e) => {
@@ -172,7 +172,7 @@ const Home = () => {
       {isShow && (
         <button
           className="btn-custom"
-          style={{ margin: 5 }}
+          style={{ margin: 5,width:200 }}
           onClick={isShowHandle}
         >
           Add Expenses
