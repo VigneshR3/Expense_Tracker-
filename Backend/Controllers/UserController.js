@@ -14,7 +14,7 @@ module.exports = {
       console.log(GetUser, "matchhhhhh0");
       if (match) {
         const token = jwt.sign(
-          {  id: GetUser._id, username: GetUser.username , role:GetUser.role },
+          {  id: GetUser._id, username: GetUser.username , role:GetUser.role ,isPremium:GetUser.isPremium},
           process.env.SECRET_KEY
         );
         console.log(token, "tokentokentoken");
@@ -68,6 +68,18 @@ module.exports = {
         console.error("Auth error:", error);
         return res.status(500).json({ message: "Internal server error" });
       }
+
+  },
+  GetPremium :async (req ,res)=>{
+    try {
+      const {Users , GetPre} = req.body
+      console.log("body",   )
+      const isPremium = await User.updateOne({_id:Users.id},{$set:{isPremium:true}})
+      console.log("Isfrgrg",isPremium)
+      res.status(200).json({ message: "your get Premium",success:true });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
 
   }
 };

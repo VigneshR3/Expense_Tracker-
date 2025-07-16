@@ -1,5 +1,6 @@
 var jwt = require("jsonwebtoken");
 require("dotenv").config();
+const User = require('../Models/UserModel')
 const authMiddleware = async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
@@ -28,5 +29,18 @@ const isUserMiddlware = async (req, res, next) => {
     return res.json({ success: false, message: "your not Authorized" });
   }
 };
+const isPremiumCheck = async (req , res , next)=>{
+  try {
+    const Ischeck = await User.findOne({_id:req.body.user})
+    console.log("dff",Ischeck)
+    if(Ischeck.isPremium){
+      next()
+    }
+    
+  } catch (error) {
+    res.json({ success: false, message: "your not Authorized" });
+  }
 
-module.exports = { authMiddleware, isUserMiddlware };
+}
+
+module.exports = { authMiddleware, isUserMiddlware,isPremiumCheck };

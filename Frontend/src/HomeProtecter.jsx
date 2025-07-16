@@ -10,24 +10,23 @@ const HomeProtecter = ({ children }) => {
     axios
       .get(`${BaseApi}/auth/ischeck-user`)
       .then((resp) => {
-        console.log("protect",resp)
-        if (resp.success) {
+        console.log("protect", resp);
 
-          setIsUser(true);
-          setIsCheck(true);
-        }
+        setIsUser(true);
+        setIsCheck(true);
       })
       .catch((e) => {
+        setIsUser(false);
         setIsCheck(true);
       });
   }, []);
-  if(isCheck){
-    return <p>loading...</p>
+  if (!isCheck) {
+    return <p>loading...</p>;
   }
-  if (!isUser) {
+  if (!isUser && isCheck) {
     return <Navigate to={"/login"} />;
   }
-  return children
+  return children;
 };
 
 export default HomeProtecter;

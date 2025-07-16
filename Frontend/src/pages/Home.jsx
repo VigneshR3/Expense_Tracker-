@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import InputField from "../componets/InputField";
 import axios from "axios";
 import { BaseApi } from "../baseApi";
@@ -6,9 +6,16 @@ import { MdOutlineEditCalendar } from "react-icons/md";
 import { ToastContainer, toast } from "react-toastify";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import Swal from "sweetalert2";
+import DatePicker from "react-datepicker";
+
+import "../../node_modules/react-datepicker/dist/react-datepicker.css";
+import Mycontext from "../Mycontext";
 
 const Home = () => {
+  const User = useContext(Mycontext);
   const [isShow, setIsShow] = useState(true);
+  const [CategoryList, setCategoryList] = useState([]);
+
   const isShowHandle = () => {
     setIsShow(false);
   };
@@ -19,7 +26,7 @@ const Home = () => {
     {
       type: "text",
       name: "Category",
-      list: ["Empty", "Food", "Trip", "Shopping","Bills", "Other"],
+      list: ["Empty", "Food", "Trip", "Shopping", "Bills", "Other"],
     },
     { type: "date", name: "Date" },
   ];
@@ -28,20 +35,18 @@ const Home = () => {
     description: "",
     category: "",
     date: "",
-    
-     
   });
-  
+
   const HandleSubmit = async (e) => {
     const { email, ...formFields } = Expense;
-  const isEmpty = Object.values(formFields).every((value) => value === "");
-    
-     if(isEmpty){
-      toast.error("please fill the fields")
+    const isEmpty = Object.values(formFields).every((value) => value === "");
+
+    if (isEmpty) {
+      toast.error("please fill the fields");
       return;
-     }
+    }
     e.preventDefault();
-    if (isEdit ) {
+    if (isEdit) {
       await axios
         .patch(`${BaseApi}/expense/update`, Expense)
         .then((resp) => {
@@ -54,28 +59,25 @@ const Home = () => {
           notify(e.response.data.message);
         });
     } else {
-      
-
-        await axios
-          .post(`${BaseApi}/expense/create`, Expense)
-          .then((resp) => {
-            console.log("Form response", resp);
-            notify(resp.data.message);
-            FetchDate();
-            setExpense({
-              name: "",
-              description: "",
-              category: "",
-              date: "",
-              email: "vicky@gmail.com",
-              id: "",
-            });
-          })
-          .catch((e) => {
-            console.log("Form error", e);
-            notify(e.response.data.message);
+      await axios
+        .post(`${BaseApi}/expense/create`, Expense)
+        .then((resp) => {
+          console.log("Form response", resp);
+          notify(resp.data.message);
+          FetchDate();
+          setExpense({
+            name: "",
+            description: "",
+            category: "",
+            date: "",
+            email: "vicky@gmail.com",
+            id: "",
           });
-      
+        })
+        .catch((e) => {
+          console.log("Form error", e);
+          notify(e.response.data.message);
+        });
     }
   };
   const UserEmail = { email: "vicky@gmail.com" };
@@ -112,7 +114,7 @@ const Home = () => {
       description: "",
       category: "",
       date: "",
-      email: "vicky@gmail.com",
+
       id: "",
     });
   };
@@ -126,7 +128,7 @@ const Home = () => {
       description: List.description,
       category: List.category,
       date: List.date,
-      email: "vicky@gmail.com",
+
       id: List._id,
     });
   };
@@ -161,10 +163,52 @@ const Home = () => {
       }
     });
   };
+  // category list && filter
+  const GetCategoryList = () => {
+    axios
+      .get(`${BaseApi}/expense/getlist`, { params: User })
+      .then((res) => {
+        console.log(res);
+        setCategoryList(res.data.list);
+      })
+      .catch((e) => console.log(e));
+  };
+  useEffect(() => {
+    GetCategoryList();
+  }, []);
+  const [List, setList] = useState({
+    category: [],
+    Date: { startDate: "", EndDate: "" },
+    user:User.id,
+  });
+  console.log("list", List);
+  const HandleFilter = (e) => {
+    const { value, checked } = e.target;
+ 
+    if (checked) {
+      setList((state) => ({ ...state, category: [...state.category, value] }));
+    } else {
+      setList((state) => ({
+        ...state,
+        category: state.category?.filter((item) => item !== value),
+      }));
+    }
+  };
+  const FetchFillterExpense = () => {
+    axios
+      .post(`${BaseApi}/expense/filter`, List)
+      .then((resp) => {
+        console.log("filter", resp);
+        setTableData(resp.data.data)
+      })
+      .catch((e) => {
+        console.log(e, "Error Filter");
+      });
+  };
+  useEffect(()=>{FetchFillterExpense()},[List])
 
   return (
     <div>
-      
       <ToastContainer />
       <h5 style={{ display: "flex", justifyContent: "center" }}>
         Expense Tracker
@@ -172,7 +216,7 @@ const Home = () => {
       {isShow && (
         <button
           className="btn-custom"
-          style={{ margin: 5,width:200 }}
+          style={{ margin: 5, width: 200 }}
           onClick={isShowHandle}
         >
           Add Expenses
@@ -197,7 +241,7 @@ const Home = () => {
                   />
                 );
               })}
-            
+
               <div style={{ display: "flex", justifyContent: "space-around" }}>
                 <button
                   className="btn-custom"
@@ -223,6 +267,63 @@ const Home = () => {
           </div>
         )}
       </center>
+      {/* Filter content */}
+      {User.isPremium == true && 
+      <div>
+        <div
+          style={{
+            maxWidth: 250,
+            border: "2px solid red",
+            borderRadius: "12px",
+            margin: 2,
+            padding: 5,
+          }}
+        >
+          <h5>Filter</h5>
+          <p>Category</p>
+          {CategoryList.map((item, i) => {
+            const itemId = `category-${i}`; // Unique ID for accessibility
+
+            return (
+              <div key={itemId}>
+                <input
+                  type="checkbox"
+                  id={itemId}
+                  style={{ margin: 2 }}
+                  name="category"
+                  value={item}
+                  onChange={HandleFilter}
+                  checked={List.category.includes(item)} // Controlled input
+                />
+                <label htmlFor={itemId}>{item}</label>
+              </div>
+            );
+          })}
+
+          <div className="form-group">
+            <label>Date Range</label>
+            <DatePicker
+              selectsRange
+              startDate={List.Date.startDate}
+              endDate={List.Date.EndDate}
+              onChange={(dates) => {
+                const [start, end] = dates;
+
+                setList((prev) => ({
+                  ...prev,
+                  Date: {
+                    startDate: start,
+                    EndDate: end,
+                  },
+                }));
+              }}
+              dateFormat="dd/MM/yyyy"
+              isClearable
+            />
+          </div>
+        </div>
+      </div>
+      }
       {/* table content */}
       <div className="styled-table-container">
         <table className="styled-table">

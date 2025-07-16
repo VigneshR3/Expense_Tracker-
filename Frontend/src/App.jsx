@@ -10,6 +10,7 @@ import { useContext, useEffect, useState } from "react";
 import Mycontext from "./Mycontext";
 import {jwtDecode} from "jwt-decode";
 import HomeProtecter from "./HomeProtecter";
+import Premium from "./pages/Premium";
 
 
 
@@ -42,6 +43,7 @@ function App() {
             <Route index element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/home" element={<HomeProtecter><Home /></HomeProtecter> } />
+            <Route path="/premium" element={<Premium/>}/>
           </Route>
         </Routes>
       </BrowserRouter>
