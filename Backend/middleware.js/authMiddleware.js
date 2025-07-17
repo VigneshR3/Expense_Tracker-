@@ -4,12 +4,13 @@ const User = require('../Models/UserModel')
 const authMiddleware = async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
+     
 
     // invalid token
     jwt.verify(token, process.env.SECRET_KEY, function (err, decoded) {
       if (err)
         return res.status(401).json({ message: "You are not authorized" });
-
+         console.log("decode",decoded)
       req.payload = { userdata: decoded };
       next();
     });

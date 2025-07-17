@@ -22,6 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 //Routers
 app.use('/api/auth',UserRouter)
 app.use('/api/expense',ExpenseRouter)
+   
  
 
 app.listen(PORT, ()=>{console.log("Server Running on "+PORT)})

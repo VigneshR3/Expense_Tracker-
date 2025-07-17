@@ -4,6 +4,8 @@ import { BaseApi } from "../baseApi";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import RegisterSchema from "../Schema/RegisterSchema";
+import { useFormik } from "formik";
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -62,11 +64,34 @@ function Register() {
     error: { color: "red" },
     lo: { textAlign: "center" },
   };
-
+  const initialValues = {
+    username: "",
+    phonenumber: "",
+    email: "",
+    password: "",
+    confirmpassword: "",
+  };
+  const formik = useFormik({
+    initialValues: initialValues,
+    validationSchema: RegisterSchema,
+    onSubmit: (value) => {
+      console.log("value", value);
+      axios
+        .post(`${BaseApi}/auth/register`, value)
+        .then((resp) => {
+          console.log("Respo", resp);
+          notify(resp.data.message || "Registration successful!");
+        })
+        .catch((e) => {
+          console.log("Error Register", e);
+          notify(e.rasponse.data.message || "Faild to Register!");
+        });
+    },
+  });
   return (
     <div style={styles.container}>
       <ToastContainer />
-      <form onSubmit={handleSubmit} style={styles.form}>
+      <form onSubmit={formik.handleSubmit} style={styles.form}>
         <h2 style={styles.lo}>Register</h2>
 
         {error && <p style={styles.error}>{error}</p>}
@@ -75,47 +100,102 @@ function Register() {
           <label>Username</label>
           <input
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            name="username"
+            value={formik.values.username}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             style={styles.input}
             placeholder="Enter your username"
           />
+          {formik.touched.username && formik.errors.username ? (
+            <p style={{ color: "red" }}>{formik.errors.username}</p>
+          ) : (
+            ""
+          )}
         </div>
+        {}
 
         <div style={styles.inputGroup}>
           <label>Email</label>
           <input
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            name="email"
+            value={formik.values.email}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             style={styles.input}
             placeholder="Enter your email"
           />
+          {formik.touched.email && formik.errors.email ? (
+            <p style={{ color: "red" }}>{formik.errors.email}</p>
+          ) : (
+            ""
+          )}
+        </div>
+        <div style={styles.inputGroup}>
+          <label>Phone Number</label>
+          <input
+            type="number"
+            name="phonenumber"
+            onKeyPress={(e) => {
+              if (!/[0-9]/.test(e.key)) {
+                e.preventDefault();
+              }
+            }}
+            value={formik.values.phonenumber}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            style={styles.input}
+            placeholder="Enter your email"
+          />
+          {formik.touched.phonenumber && formik.errors.phonenumber ? (
+            <p style={{ color: "red" }}>{formik.errors.phonenumber}</p>
+          ) : (
+            ""
+          )}
         </div>
 
         <div style={styles.inputGroup}>
           <label>Password</label>
           <input
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            name="password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             style={styles.input}
             placeholder="Enter your password"
           />
+          {formik.touched.password && formik.errors.password ? (
+            <p style={{ color: "red" }}>{formik.errors.password}</p>
+          ) : (
+            ""
+          )}
         </div>
 
         <div style={styles.inputGroup}>
           <label>Confirm Password</label>
           <input
             type="password"
-            value={confirmpassword}
-            onChange={(e) => setConfirmpassword(e.target.value)}
+            name="confirmpassword"
+            value={formik.values.confirmpassword}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             style={styles.input}
             placeholder="Confirm your password"
           />
+          {formik.touched.confirmpassword && formik.errors.confirmpassword ? (
+            <p style={{ color: "red" }}>{formik.errors.confirmpassword}</p>
+          ) : (
+            ""
+          )}
         </div>
 
-        <button type="submit" className="btn-custom">
+        <button
+          type="submit"
+          className="btn-custom"
+          onClick={formik.handleSubmit}
+        >
           Register
         </button>
 

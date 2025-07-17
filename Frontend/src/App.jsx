@@ -17,9 +17,8 @@ import Premium from "./pages/Premium";
 function App() {
   const [User, setUser] = useState({});
   const token = localStorage.getItem("token");
-     
-  useEffect(()=>{
-    
+  const DecodeFunction = ()=>{
+
     if (token ) {
       try {
       const decoded = jwtDecode(token);
@@ -30,6 +29,9 @@ function App() {
           
       }
     }
+  }   
+  useEffect(()=>{
+    DecodeFunction()
   },[token]) 
 
  

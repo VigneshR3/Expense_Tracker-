@@ -30,17 +30,18 @@ module.exports = {
   UserRegisters: async (req, res) => {
     try {
       console.log(req.body, "register.....");
-      console.log(req.payload, "from midddddllellware")
+       
 
       const ExitUser = await User.findOne({ email: req.body.email });
-      console.log("efef", ExitUser);
       if (!ExitUser) {
         const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
-
+        console.log("efef", ExitUser,hashedPassword);
+ 
         const newUser = new User({
           username: req.body.username,
           email: req.body.email,
           password: hashedPassword,
+          phonenumber :  String(req.body.phonenumber)
         });
         await newUser.save();
         res.status(201).json({ message: "Successfully created" });
@@ -48,7 +49,8 @@ module.exports = {
         res.status(401).json({ message: "Faild ! to created/user Exit " });
       }
     } catch (error) {
-      res.status(401).json({ message: "Faild ! to created " });
+      console.log(error)
+      res.status(401).json({ message: "Faild ! to created ",error });
     }
   },
   IsCheckUser : (req , res)=>{
