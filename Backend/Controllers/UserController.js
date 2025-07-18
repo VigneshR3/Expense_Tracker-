@@ -6,7 +6,7 @@ const saltRounds = 10;
 module.exports = {
   UserLogin: async (req, res) => {
     try {
-      console.log(req.body);
+      console.log("login",req.body);
       const GetUser = await User.findOne({ email: req.body.email });
       const Email = req.body.email;
       const password = req.body.password;
@@ -55,15 +55,19 @@ module.exports = {
   },
   IsCheckUser : (req , res)=>{
     try {
-        const token = req.headers.authorization.split(" ")[1];
+        const token = req.headers.authorization?.split(" ")[1];
     
         // invalid token
         jwt.verify(token, process.env.SECRET_KEY, function (err, decoded) {
+          console.log("decodeadmin",decoded)
           if (err)
             return res.status(401).json({ message: "You are not authorized" });
-    
-          if(decoded){
-            return res.status(200).json({success:true})
+      
+          if(decoded.role === "USER"){
+            return res.status(200).json({success:true,role:"USER"})
+          }
+          if(decoded.role === "ADMIN"){
+            return res.status(200).json({success:true,role:"ADMIN"})
           }
         });
       } catch (error) {
@@ -76,12 +80,18 @@ module.exports = {
     try {
       const {Users , GetPre} = req.body
       console.log("body",   )
-      const isPremium = await User.updateOne({_id:Users.id},{$set:{isPremium:true}})
-      console.log("Isfrgrg",isPremium)
-      res.status(200).json({ message: "your get Premium",success:true });
+      if(Users.id){
+
+        const isPremium = await User.updateOne({_id:Users.id},{$set:{isPremium:true}})
+        console.log("Isfrgrg",isPremium)
+        res.status(200).json({ message: "your get Premium",success:true });
+        return
+    }
+    return res.status(401).json({ message: "You are not authorized/Go to Login" });
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
 
   }
+  
 };

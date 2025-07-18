@@ -6,7 +6,7 @@ import axios from "axios";
 axios.interceptors.request.use((request) => {
    try {
 var token = ""
-     token = localStorage?.getItem("token");
+     token = localStorage?.getItem("adminToken")|| localStorage?.getItem("userToken");
     if (token) {
       request.headers.Authorization = `Bearer ${token}`;
     }

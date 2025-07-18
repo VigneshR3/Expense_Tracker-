@@ -6,12 +6,13 @@ import { BaseApi } from "./baseApi";
 const HomeProtecter = ({ children }) => {
   const [isCheck, setIsCheck] = useState(false);
   const [isUser, setIsUser] = useState(false);
+   
   useEffect(() => {
     axios
       .get(`${BaseApi}/auth/ischeck-user`)
       .then((resp) => {
         console.log("protect", resp);
-
+   
         setIsUser(true);
         setIsCheck(true);
       })
@@ -26,6 +27,7 @@ const HomeProtecter = ({ children }) => {
   if (!isUser && isCheck) {
     return <Navigate to={"/login"} />;
   }
+   
   return children;
 };
 

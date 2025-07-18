@@ -8,3 +8,7 @@ const LoginSchema = Yup.object({
   ),
 });
 export default LoginSchema;
+// .matches(
+//     /^[A-Z]{2}[a-z]{4}[0-9]{3}$/,
+//     "Password must start with an uppercase letter, followed by 4 lowercase letters, and end with 3 number"
+//   ),

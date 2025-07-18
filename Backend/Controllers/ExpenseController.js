@@ -28,6 +28,17 @@ module.exports = {
       res.status(400).json({ message: "Faild ! fetch data" });
     }
   },
+  GetOneExpense: async (req, res) => {
+    try {
+       
+      
+      console.log(req.body)
+      const getDate = await Expense.find({ userId: req.body.params});
+      res.status(200).json({ message: "fetch data", data: getDate });
+    } catch (error) {
+      res.status(400).json({ message: "Faild ! fetch data" });
+    }
+  },
 
   UpdateExpense: async (req, res) => {
     try {

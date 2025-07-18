@@ -371,6 +371,7 @@ const Home = () => {
           </tbody>
         </table>
       </div>
+       {TableData?.length === 0 && <h6 style={{display:"flex",justifyContent:'center',alignItems:"center"}}>Empty table</h6>}
     </div>
   );
 };

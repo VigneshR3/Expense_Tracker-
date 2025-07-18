@@ -16,32 +16,7 @@ function Register() {
 
   const notify = (message) => toast(message);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-
-    if (!username || !email || !password || !confirmpassword) {
-      setError("All fields are required.");
-      return;
-    }
-
-    if (password !== confirmpassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    try {
-      const res = await axios.post(`${BaseApi}/auth/register`, {
-        username,
-        email,
-        password,
-      });
-      notify(res.data.message || "Registration successful!");
-    } catch (e) {
-      setError("Registration failed.");
-      console.error("Error:", e);
-    }
-  };
+  
 
   const styles = {
     container: { padding: 20, maxWidth: 360, margin: "auto" },

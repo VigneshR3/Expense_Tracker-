@@ -1,16 +1,19 @@
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import Avatar from './Avatar';
 import Mycontext from '../Mycontext';
  import { ToastContainer, toast } from "react-toastify";
 
 const Header = () => {
   const user = useContext(Mycontext)
+  const navigate = useNavigate()
   const notify = (message) => toast(message);
   console.log("mycontext",user)
   const HandleLogout = ()=>{
     localStorage.removeItem('token')
+     navigate('/login')
      notify("Logout Successfully")
+     window.location.reload();
   }
   return (
     <header className="bg-primary text-white p-4 shadow-md">

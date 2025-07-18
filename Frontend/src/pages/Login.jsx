@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import LoginSchema from "../Schema/LoginShema";
 import { useFormik } from "formik";
+import { jwtDecode } from "jwt-decode";
 import { BaseApi } from "../baseApi";
 function Login() {
   const [email, setEmail] = useState("");
@@ -32,48 +33,31 @@ function Login() {
     lo: { textAlign: "center" },
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
-
-    if (!email || !password) {
-      setError("Email and password are required.");
-      return;
-    }
-
-    try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
-        email,
-        password,
-      });
-      if (res.status === 200) {
-        const { token } = res.data;
-        localStorage.setItem("token", token);
-        navigate("/home");
-        notify("Login Successfully");
-      }
-      setEmail("");
-      setPassword("");
-    } catch (err) {
-      console.error("Login Failed:", err);
-      setError("Invalid email or password.");
-    }
-  };
   const initialValues = { email: "", password: "" };
   const Formik = useFormik({
     initialValues: initialValues,
     validationSchema: LoginSchema,
-    onSubmit: (value) => {
+    onSubmit: async (value) => {
       console.log("login value", value);
-      axios
+      await axios
         .post(`${BaseApi}/auth/login`, value)
         .then((resp) => {
           console.log("response", resp);
           if (resp.status === 200) {
             const { token } = resp.data;
-            localStorage.setItem("token", token);
-            navigate("/home");
-            notify("Login Successfully");
+            const decode = jwtDecode(token);
+            if (decode.role === "USER") {
+              localStorage.setItem("userToken", token);
+              navigate("/home");
+              notify("Login Successfully");
+              window.location.reload();
+            }
+            if (decode.role === "ADMIN") {
+              localStorage.setItem("adminToken", token);
+              navigate("/admin");
+              notify("Login Successfully");
+              window.location.reload();
+            }
           }
         })
         .catch((e) => {

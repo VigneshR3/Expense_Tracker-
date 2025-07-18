@@ -8,48 +8,80 @@ import Home from "./pages/Home";
 import View from "./pages/View";
 import { useContext, useEffect, useState } from "react";
 import Mycontext from "./Mycontext";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import HomeProtecter from "./HomeProtecter";
 import Premium from "./pages/Premium";
-
-
+import AdminView from "./Admin/AdminView";
+import Dhashboard from "./Admin/pages/Dhashboard";
+import UserDetails from "./Admin/pages/UserDetails";
+import UserPage from "./Admin/pages/UserPage";
+import AdminProtecter from "./Admin/AdminProtecter";
+import NOTfound from "./Admin/pages/NOTfound";
 
 function App() {
   const [User, setUser] = useState({});
-  const token = localStorage.getItem("token");
-  const DecodeFunction = ()=>{
+  const token =
+    localStorage.getItem("userToken") || localStorage.getItem("adminToken");
 
-    if (token ) {
+  console.log("token", token);
+  useEffect(() => {
+    if (token) {
       try {
-      const decoded = jwtDecode(token);
+        const decoded = jwtDecode(token);
         console.log("Decoded user:", decoded);
-          setUser(decoded)
+
+        setUser(decoded);
       } catch (error) {
         console.error("Invalid token:", error.message);
-          
+        setUser(null);
       }
     }
-  }   
-  useEffect(()=>{
-    DecodeFunction()
-  },[token]) 
+  }, [token]);
 
- 
- 
-   
   return (
-    <Mycontext value={User}>
+    <>
+      {/* //Admin Routers */}
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<View />}>
-            <Route index element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/home" element={<HomeProtecter><Home /></HomeProtecter> } />
-            <Route path="/premium" element={<Premium/>}/>
+          <Route
+            path="/admin"
+            element={
+              <AdminProtecter>
+                <AdminView />
+              </AdminProtecter>
+            }
+          >
+            <Route index element={<Dhashboard />} />
+            <Route path="/admin/detail" element={<UserDetails />} />
+            <Route path="/admin/user" element={<UserPage />} />
+           
+            <Route index element={<Dhashboard />} />
+            {/* <Route path="*" element={<NOTfound />} /> */}
           </Route>
         </Routes>
-      </BrowserRouter>
-    </Mycontext>
+      
+      {/* User Router */}
+      <Mycontext value={User}>
+         
+          <Routes>
+            <Route path="/" element={<View />}>
+              <Route index element={<Register />} />
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/home"
+                element={
+                  <HomeProtecter>
+                    <Home />
+                  </HomeProtecter>
+                }
+              />
+              <Route path="/premium" element={<Premium />} />
+              {/* <Route path="*" element={<NOTfound />} /> */}
+            </Route>
+          </Routes>
+      </Mycontext>
+        </BrowserRouter>
+    </>
   );
 }
 
